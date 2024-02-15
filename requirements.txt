@@ -1,0 +1,11 @@
+evaluate
+transformers
+datasets
+scikit-learn
+torch
+accelerate
+bitsandbytes
+peft
+trl
+stanza
+pyyaml

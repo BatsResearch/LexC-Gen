@@ -1,0 +1,20 @@
+# follow NusaX paper (https://arxiv.org/pdf/2205.15960.pdf)
+nusax:
+  batch_size: 32
+  num_epochs: 100
+  max_length: 164
+  early_stopping_patience: 3
+  lr: 1e-5
+  label_column: "label"
+  num_labels: 3
+
+# follow SIB paper (https://arxiv.org/pdf/2309.07445.pdf)
+sib200:
+  batch_size: 16
+  num_epochs: 20
+  max_length: 164
+  early_stopping_patience: 3
+  lr: 1e-5
+  label_column: "category"
+  num_labels: 7
+
