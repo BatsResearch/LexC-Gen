@@ -1,0 +1,196 @@
+
+# LexC-Gen: Lexicon-Conditioned Data Generation for Extremely Low-Resource Languages
+
+LexC-Gen generates sentiment analysis and topic classification data for extremely low-resource languages using open-access models and bilingual lexicons. The key idea is to prompt LLMs to generate English (or any high-resource-language) task data using words from bilingual lexicons so the generated dataset can be better word-translated into low-resource languages.
+
+See our paper for further information. (Add link). 
+
+Our repository provides code for LexC-Gen used for [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) and [SIB-200 (Adelani et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) datasets, but our code are written in a manner that can be easily adapted to other datasets. 
+
+--
+## Setup
+
+```
+git clone ...
+cd ...
+pip3 install -r requirements.txt
+```
+
+## Download Task Datasets and Bilingual Lexicons
+### Task Datasets
+We experiment with [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) and [SIB-200 (Adelani et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) datasets. These datasets are also available on HuggingFace but our work uses their raw csv/tsv files hosted on GitHub.
+
+```bash
+# nusax
+cd ... # your designated datasets folder
+git clone https://github.com/IndoNLP/nusax.git
+
+# sib200
+cd ... # your designated datasets folder
+git clone https://github.com/dadelani/sib-200.git # follow their README instructions to create SIB dataset.
+```
+
+### Bilingual Lexicons
+We use [GATITOS bilingual lexicons (Jones et al., 2023)](https://aclanthology.org/2023.emnlp-main.26/) for our work, which maps English words to many extremely low-resource languages.
+
+```bash
+cd ... # your designated lexicon folder
+git clone https://github.com/google-research/url-nlp.git
+```
+
+---
+
+## LexC-Gen
+![LexC-Gen overview](assets/lexcgen-method.jpg)
+In step (1) and (2), we first train [BLOOMZ-7.1B (Muennighoff et al., 2023)](https://aclanthology.org/2023.acl-long.891/) for controlled-text generation (CTG) and then use it to generate English datasets conditioned on bilingual lexicons. After that, in step (3) and (4), we perform input-label consistency label filtering and word-to-word translation to translate the generated data into low-resource languages.
+
+### CTG-Training 
+#### Prepare CTG-Training Dataset
+We first prepare the CTG-training dataset from the existing task data.
+
+```bash
+# nusax
+EXIST_DATA="/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv"
+OUTPUT_FILE="/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/ctg_data/nusax_en.txt"
+TASK="nusax"
+python3 ./scripts/ctg_dataset.py \
+	--existing_task_data $EXIST_DATA \
+	--output_file $OUTPUT_FILE \
+	--task_data $TASK
+
+# sib200
+EXIST_DATA="/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/train.tsv"
+OUTPUT_FILE="/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/ctg_data/sib200_en.txt"
+TASK="sib200"
+python3 ./scripts/ctg_dataset.py \
+	--existing_task_data $EXIST_DATA \
+	--output_file $OUTPUT_FILE \
+	--task_data $TASK
+```
+
+#### CTG-Training with QLoRA
+Now, we perform CTG-training for the BLOOMZ-7b1 model using [QLoRA (Dettmers et al., 2023)](https://arxiv.org/abs/2305.14314), which allows us to finetune the model on a single V100 or RTX3090 GPU. We already set the best hyperparameters.
+
+```bash
+# nusax
+OUTPUT_DIR=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub
+python3 ./scripts/ctg_train.py \
+	--ctg_dataset ./outputs/ctg_data/nusax_en.txt \
+	--output_dir $OUTPUT_DIR/bloomz-7b1-nusax-en-ctg/ \
+	--logging_steps 500 \
+	--eval_steps 500 \
+	--save_steps 500 \
+	--num_train_epochs 10
+
+# sib200
+OUTPUT_DIR=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub
+python3 ./scripts/ctg_train.py \
+	--ctg_dataset ./outputs/ctg_data/sib200_en.txt \
+	--output_dir $OUTPUT_DIR/bloomz-7b1-sib200-en-ctg/ \
+	--logging_steps 500 \
+	--eval_steps 500 \
+	--save_steps 500 \
+	--num_train_epochs 10
+```
+
+#### Selecting Best CTG-trained Checkpoint
+We select the best QLoRA adapter checkpoint based on its ability to use provided words to form sentences. We found that different languages in Gatitos can have different entries. Therefore, the best checkpoint can be different for different low-resource languages in generating task data. 
+
+We recommend selecting the best checkpoint for the language you want to create tasks for, although the best checkpoint for a language usually applies to other languages. 
+
+```bash
+# nusax
+CKPT=...
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+python3 ./scripts/ctg_eval_ckpt.py \
+	--peft_model_id $CKPT \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--task_data "nusax" \
+	--tgt_lang $TGT_LANG \
+	--total 200 \
+	--top_p 0.1 \
+	--temperature 1.0 \
+	--do_print_output
+
+# sib200
+CKPT=...
+TGT_LANG="gn" # 
+python3 ./scripts/ctg_eval_ckpt.py \
+	--peft_model_id $CKPT \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--task_data "sib200" \
+	--tgt_lang $TGT_LANG \
+	--total 200 \
+	--top_p 0.1 \
+	--temperature 1.0 \
+	--do_print_output
+```
+
+We have provided the scripts `scripts/ctg_eval_ckpt_nusax.sh` and `scripts/ctg_eval_ckpt_sib200.sh` to print out the average lexicon usage for every CTG-training checkpoint. You just have to select the checkpoint with the largest usage. We already set the best hyperparameters.
+
+**Sanity Check**: A good checkpoint for NusaX would use >5.5 provided tokens (out of 10) on average, and for SIB-200 it would be >1.5 tokens on average.
+
+### Lexicon-Conditioned Task Data Generation
+We can now generate English data using the CTG-trained checkpoint and the bilingual lexicon. We already set the best hyperparameters.
+
+```bash
+# nusax
+TGT_LANG="ace" 
+TOTAL=10000
+CKPT=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub/bloomz-7b1-nusax-en-ctg/checkpoint-3000
+WRITE_FOLDER=/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/lexcgen-nusax
+WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.txt"
+python3 ./scripts/lexcgen_ctg.py \
+	--write_file $WRITE_FILE \
+	--peft_model_id $CKPT \
+	--tgt_lang $TGT_LANG \
+	--total $TOTAL \
+	--task_data nusax \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos"
+
+# sib200
+TGT_LANG="gn" 
+TOTAL=10000
+CKPT=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub/bloomz-7b1-sib200-en-ctg/checkpoint-3000
+WRITE_FOLDER=./outputs/lexcgen-sib200
+WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.txt"
+python3 ./scripts/lexcgen_ctg.py \
+	--write_file $WRITE_FILE \
+	--peft_model_id $CKPT \
+	--tgt_lang $TGT_LANG \
+	--total $TOTAL \
+	--task_data sib200 \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos"
+```
+
+### Input-Label Filtering and Word-to-Word Translation
+Our codes here will generate four artifacts:
+- the English generated dataset in csv/tsv format. 
+- filtered English generated dataset.
+- tokenized and filtered English generated dataset.
+- translated generated task dataset.
+
+```bash
+TGT_LANG="ace"
+WRITE_FILE="./outputs/lexcgen-nusax/bloomz-7b1-nusax-en-ace-total10000.txt"
+OUTPUT_DIR="./outputs/final-nusax/"
+python3 ./scripts/lexcgen_filter.py \
+	--target_lang $TGT_LANG \
+	--file $WRITE_FILE \
+	--task_data "nusax" \
+	--output_dir $OUTPUT_DIR \
+	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv" \
+	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv"
+
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file $WRITE_FILE \
+	--task_data "nusax" \
+	--output_dir $OUTPUT_DIR \
+	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv" \
+	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv"
+```
+
+---
+
+## Evaluation
