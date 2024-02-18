@@ -291,6 +291,8 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--train_csv_path "${DATA}/sib-200/data/eng/train.tsv" \
 	--valid_csv_path "${DATA}/sib-200/data/eng/dev.tsv" \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
+
+... # eval with the word-translated train datasets
 ```
 
 ### Word Translation
