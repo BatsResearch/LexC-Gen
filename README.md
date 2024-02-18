@@ -279,22 +279,27 @@ Because the columns of the HF datasets have to be renamed and the label names ne
 
 ```bash
 # nusax
-TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+TGT_LANG="ace"
 SIZE="100k"
 CONFIG="${TGT_LANG}_${SIZE}"
+OUTPUT_DIR=... # directory to save your trained classifiers
 python3 ./scripts_eval/nusax_task_hf_data.py \
 	--train_dataset_config $CONFIG \
 	--lang $TGT_LANG \
-	--num_epochs 100
+	--num_epochs 100 \
+	--output_dir $OUTPUT_DIR
 
 # sib200
+TGT_LANG="gn"
 TGT_LANG_FULL="grn_Latn"
 SIZE="100k"
-CONFIG="${TGT_LANG_FULL}_${SIZE}"
-python3 ./scripts_eval/sib_task_hf_data.py \
+CONFIG="${TGT_LANG}_${SIZE}"
+OUTPUT_DIR=... # directory to save your trained classifiers
+python3 ./scripts_eval/sib200_task_hf_data.py \
 	--train_dataset_config $CONFIG \
 	--lang $TGT_LANG_FULL \
-	--num_epochs 100
+	--num_epochs 100 \
+	--output_dir $OUTPUT_DIR
 ```
 
 ---
