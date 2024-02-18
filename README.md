@@ -24,11 +24,13 @@ We experiment with [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.e
 
 ```bash
 # nusax
-cd ... # your designated datasets folder
+DATA=... # your designated datasets folder
+cd $DATA
 git clone https://github.com/IndoNLP/nusax.git
 
 # sib200
-cd ... # your designated datasets folder
+DATA=... # your designated datasets folder
+cd $DATA
 git clone https://github.com/dadelani/sib-200.git # follow their README instructions to create SIB dataset.
 ```
 
@@ -36,7 +38,7 @@ git clone https://github.com/dadelani/sib-200.git # follow their README instruct
 We use [GATITOS bilingual lexicons (Jones et al., 2023)](https://aclanthology.org/2023.emnlp-main.26/) for our work, which maps English words to many extremely low-resource languages.
 
 ```bash
-cd ... # your designated lexicon folder
+cd $LEX # your designated bilingual lexicon folder
 git clone https://github.com/google-research/url-nlp.git
 ```
 
@@ -52,8 +54,9 @@ We first prepare the CTG-training dataset from the existing task data.
 
 ```bash
 # nusax
-EXIST_DATA="/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv"
-OUTPUT_FILE="/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/ctg_data/nusax_en.txt"
+OUTPUT=... # your designated output folder for storing LexC-Gen data artifacts.
+EXIST_DATA="${DATA}/nusax/datasets/sentiment/english/train.csv"
+OUTPUT_FILE="${OUTPUT}/ctg_data/nusax_en.txt"
 TASK="nusax"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
@@ -61,8 +64,9 @@ python3 ./scripts/ctg_dataset.py \
 	--task_data $TASK
 
 # sib200
-EXIST_DATA="/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/train.tsv"
-OUTPUT_FILE="/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/ctg_data/sib200_en.txt"
+OUTPUT=... # your designated output folder for storing LexC-Gen data artifacts.
+EXIST_DATA="${DATA}/sib-200/data/eng/train.tsv"
+OUTPUT_FILE="${OUTPUT}/ctg_data/sib200_en.txt"
 TASK="sib200"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
