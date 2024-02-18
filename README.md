@@ -249,5 +249,5 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 
 ## 🧩 Results Comparison (Sanity Check)
 
-We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to improve reproducibility and provide a form of sanity check since for finetuning classifiers on certain low-resource languages, the average accuracy may vary.
+We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to provide a form of sanity check for reproduced results by other researchers.
 
