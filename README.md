@@ -293,5 +293,11 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
 
+
+### Notes
+
+- **Adding Existing Task Data**: This additional trick that works well for small word-translated datasets (word translation baseline and LexC-Gen-1K) is where we simply concatenate existing English training data to the translated training data.
+
+
 ---
 ## 📍 Bibtex
