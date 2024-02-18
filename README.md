@@ -171,8 +171,8 @@ python3 ./scripts/lexcgen_ctg.py \
 ### Input-Label Filtering and Word-to-Word Translation
 Our codes here will generate four artifacts:
 - the English generated dataset in csv/tsv format. 
-- filtered English generated dataset.
-- translated generated task dataset.
+- filtered English generated dataset (file starts with `filtered-*`).
+- translated generated task dataset (file starts with `translated_filtered-*`)
 
 **🎯 The translated generated task dataset is the data that we use to finetune task classifiers with.**
 
