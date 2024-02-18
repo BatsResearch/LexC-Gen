@@ -12,10 +12,11 @@ This repository provides code for LexC-Gen used for generating sentiment analysi
 ---
 ## 🧱 Setup
 
-```
+```bash
 git clone https://github.com/BatsResearch/LexC-Gen.git
 cd LexC-Gen
 pip3 install -r requirements.txt
+mkdir outputs # create outputs directory in LexC-Gen folder for storing all generated data artifacts
 ```
 
 ## ⤵️ Download Task Datasets and Bilingual Lexicons
@@ -54,9 +55,8 @@ We first prepare the CTG-training dataset from the existing task data.
 
 ```bash
 # nusax
-OUTPUT_DIR=... # your designated output folder for storing LexC-Gen data artifacts.
 EXIST_DATA="${DATA}/nusax/datasets/sentiment/english/train.csv"
-OUTPUT_FILE="${OUTPUT_DIR}/ctg_data/nusax_en.txt"
+OUTPUT_FILE="./outputs/ctg_data/nusax_en.txt"
 TASK="nusax"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
@@ -64,9 +64,8 @@ python3 ./scripts/ctg_dataset.py \
 	--task_data $TASK
 
 # sib200
-OUTPUT_DIR=... # your designated output folder for storing LexC-Gen data artifacts.
 EXIST_DATA="${DATA}/sib-200/data/eng/train.tsv"
-OUTPUT_FILE="${OUTPUT_DIR}/ctg_data/sib200_en.txt"
+OUTPUT_FILE="./outputs/ctg_data/sib200_en.txt"
 TASK="sib200"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
@@ -81,7 +80,7 @@ Now, we perform CTG-training for the BLOOMZ-7b1 model using [QLoRA (Dettmers et 
 # nusax
 python3 ./scripts/ctg_train.py \
 	--ctg_dataset ./outputs/ctg_data/nusax_en.txt \
-	--output_dir $OUTPUT_DIR/bloomz-7b1-nusax-en-ctg/ \
+	--output_dir ./outputs/bloomz-7b1-nusax-en-ctg/ \
 	--logging_steps 500 \
 	--eval_steps 500 \
 	--save_steps 500 \
@@ -90,7 +89,7 @@ python3 ./scripts/ctg_train.py \
 # sib200
 python3 ./scripts/ctg_train.py \
 	--ctg_dataset ./outputs/ctg_data/sib200_en.txt \
-	--output_dir $OUTPUT_DIR/bloomz-7b1-sib200-en-ctg/ \
+	--output_dir ./outputs/bloomz-7b1-sib200-en-ctg/ \
 	--logging_steps 500 \
 	--eval_steps 500 \
 	--save_steps 500 \
@@ -142,10 +141,10 @@ We can now generate English data using the CTG-trained checkpoint and the biling
 ```bash
 # nusax
 TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
-TOTAL=10000 # number of sentences to be generated
+TOTAL=100000 # number of sentences to be generated
 CKPT=... # best checkpoint found
-WRITE_FOLDER="{OUTPUT_DIR}/lexcgen-nusax"
-WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.txt"
+WRITE_FOLDER="./outputs/lexcgen-nusax"
+WRITE_FILE="./outputs/bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.txt"
 python3 ./scripts/lexcgen_ctg.py \
 	--write_file $WRITE_FILE \
 	--peft_model_id $CKPT \
@@ -156,10 +155,10 @@ python3 ./scripts/lexcgen_ctg.py \
 
 # sib200
 TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
-TOTAL=10000 # number of sentences to be generated
+TOTAL=100000 # number of sentences to be generated
 CKPT=... # best checkpoint found
-WRITE_FOLDER="${OUTPUT_DIR}/lexcgen-sib200"
-WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.txt"
+WRITE_FOLDER="./outputs/lexcgen-sib200"
+WRITE_FILE="./outputs/bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.txt"
 python3 ./scripts/lexcgen_ctg.py \
 	--write_file $WRITE_FILE \
 	--peft_model_id $CKPT \
@@ -175,40 +174,44 @@ Our codes here will generate four artifacts:
 - filtered English generated dataset.
 - translated generated task dataset.
 
+**The translated generated task dataset is the data that we use to finetune task classifiers with.**
+
 ```bash
-TGT_LANG="ace"
-WRITE_FILE="./outputs/lexcgen-nusax/bloomz-7b1-nusax-en-ace-total100000.txt"
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+TOTAL=100000 
+READ_FILE="./outputs/lexcgen-nusax/bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.txt"  # raw generated file from CTG-trained LLMs
 OUTPUT_DIR="./outputs/final-nusax/"
 python3 ./scripts/lexcgen_filter.py \
 	--target_lang $TGT_LANG \
-	--file $WRITE_FILE \
+	--file $READ_FILE \
 	--task_data "nusax" \
 	--output_dir $OUTPUT_DIR \
-	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv" \
-	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv"
+	--filter_train_file "${DATA}/nusax/datasets/sentiment/english/train.csv" \
+	--filter_valid_file "${DATA}/nusax/datasets/sentiment/english/valid.csv"
 
 python3 ./scripts/lexcgen_translate.py \
 	--target_lang $TGT_LANG \
-	--file "./outputs/final-nusax/filtered-bloomz-7b1-nusax-en-ace-total100000.csv" \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--file "./outputs/final-nusax/filtered-bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.csv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--output_dir "./outputs/final-nusax/"
 
 # sib200
-TGT_LANG="gn"
-WRITE_FILE="./outputs/lexcgen-sib200/bloomz-7b1-sib200-en-gn-total100000.txt"
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
+TOTAL=100000 # number of sentences to be generated
+READ_FILE="./outputs/lexcgen-sib200/bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.txt"  # raw generated file from CTG-trained LLMs
 OUTPUT_DIR="./outputs/final-sib200/"
 python3 ./scripts/lexcgen_filter.py \
 	--target_lang $TGT_LANG \
-	--file $WRITE_FILE \
+	--file $READ_FILE \
 	--task_data "sib200" \
 	--output_dir $OUTPUT_DIR \
-	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/train.tsv" \
-	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/dev.tsv"
+	--filter_train_file "${DATA}/sib-200/data/eng/train.tsv" \
+	--filter_valid_file "${DATA}/sib-200/data/eng/dev.tsv"
 
 python3 ./scripts/lexcgen_translate.py \
 	--target_lang $TGT_LANG \
-	--file "./outputs/final-sib200/filtered-bloomz-7b1-sib200-en-gn-total100000.tsv" \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--file "./outputs/final-sib200/filtered-bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.tsv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--output_dir "./outputs/final-sib200/"
 ```
 
