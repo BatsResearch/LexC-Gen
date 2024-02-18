@@ -250,12 +250,13 @@ Now we perform task finetuning of mBERT classifier on the LexC-Gen generated dat
 ```bash
 # nusax
 TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+NUSAX_TGT_LANG_FULL="acehnese"
 TOTAL=100000
 python3 ./scripts_eval/nusax_task_local_data.py \
 	--target_lang $TGT_LANG \
 	--train_csv_path "./outputs/final-nusax/translated_filtered-bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.csv" \
 	--valid_csv_path "./outputs/final-nusax-valid/${TGT_LANG}/translated_valid.csv" \
-	--test_csv_path "${DATA}/nusax/datasets/sentiment/acehnese/test.csv"
+	--test_csv_path "${DATA}/nusax/datasets/sentiment/${NUSAX_TGT_LANG_FULL}/test.csv"
 
 # sib200
 TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
@@ -270,6 +271,27 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 
 ---
 ## 📓 Baselines
+
+### Cross-Lingual Zero-Shot
+Baseline where we finetune classifier on English (existing) train dataset.
+```bash
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+NUSAX_TGT_LANG_FULL="acehnese"
+python3 ./scripts_eval/nusax_task_local_data.py \
+	--target_lang $TGT_LANG \
+	--train_csv_path "${DATA}/nusax/datasets/sentiment/english/train.csv" \
+	--valid_csv_path "${DATA}/nusax/datasets/sentiment/english/valid.csv" \
+	--test_csv_path "${DATA}/nusax/datasets/sentiment/${NUSAX_TGT_LANG_FULL}/test.csv"
+
+# sib200
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
+SIB_TGT_LANG_FULL="grn_Latn"
+python3 ./scripts_eval/sib200_task_local_data.py \
+	--target_lang $TGT_LANG \
+	--train_csv_path "${DATA}/sib-200/data/eng/train.tsv" \
+	--valid_csv_path "${DATA}/sib-200/data/eng/dev.tsv" \
+	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
+```
 
 ---
 ## 📍 Bibtex
