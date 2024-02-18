@@ -174,7 +174,7 @@ Our codes here will generate four artifacts:
 - filtered English generated dataset.
 - translated generated task dataset.
 
-**The translated generated task dataset is the data that we use to finetune task classifiers with.**
+**🎯 The translated generated task dataset is the data that we use to finetune task classifiers with.**
 
 ```bash
 TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
