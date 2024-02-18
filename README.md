@@ -270,7 +270,7 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 ```
 
 ---
-## 📓 Baselines
+## 🧊 Baselines
 
 ### Cross-Lingual Zero-Shot
 Baseline where we finetune classifier on English (existing) train dataset.
