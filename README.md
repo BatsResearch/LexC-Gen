@@ -109,7 +109,7 @@ The code below evaluates a particular checkpoint on how many words it used (as i
 ```bash
 # nusax
 CKPT=... # path to a particular lora checkpoint
-TGT_LANG="mad" # ace, ban, bbc, bjn, bug, mad, min
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
 python3 ./scripts/ctg_eval_ckpt.py \
 	--peft_model_id $CKPT \
 	--lexicons_dir "${LEX}/url-nlp/gatitos" \
@@ -223,36 +223,47 @@ python3 ./scripts/lexcgen_translate.py \
 ## 🔍 Evaluation
 
 ### Generate Validation Dataset for Task Finetuning
+Our synthetic data generated above are solely for training.
+
+For validation data, we perform word translation on the existing task validation data.
 ```bash
-TGT_LANG="mad"
+# nusax
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
 python3 ./scripts/lexcgen_translate.py \
 	--target_lang $TGT_LANG \
-	--file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv" \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--file "${DATA}/nusax/datasets/sentiment/english/valid.csv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--output_dir "./outputs/final-nusax-valid/${TGT_LANG}"
 
-TGT_LANG="gn"
+# sib200
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
 python3 ./scripts/lexcgen_translate.py \
 	--target_lang $TGT_LANG \
-	--file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/dev.tsv" \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--file "${DATA}/sib-200/data/eng/dev.tsv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--output_dir "./outputs/final-sib200-valid/${TGT_LANG}"
 ```
 
-
 ### Evaluate
+Now we perform task finetuning of mBERT classifier on the LexC-Gen generated data and evaluate on the test dataset.
+
 ```bash
-TGT_LANG="ace"
+# nusax
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+TOTAL=100000
 python3 ./scripts_eval/nusax_task_local_data.py \
 	--target_lang $TGT_LANG \
-	--train_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-nusax/translated_filtered-bloomz-7b1-nusax-en-ace-total100000.csv" \
-	--valid_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-nusax-valid/ace/translated_valid.csv" \
-	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/acehnese/test.csv"
+	--train_csv_path "./outputs/final-nusax/translated_filtered-bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.csv" \
+	--valid_csv_path "./outputs/final-nusax-valid/${TGT_LANG}/translated_valid.csv" \
+	--test_csv_path "${DATA}/nusax/datasets/sentiment/acehnese/test.csv"
 
-TGT_LANG="gn"
+# sib200
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
+SIB_TGT_LANG_FULL="grn_Latn"
+TOTAL=100000
 python3 ./scripts_eval/sib200_task_local_data.py \
 	--target_lang $TGT_LANG \
-	--train_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-sib200/translated_filtered-bloomz-7b1-sib200-en-gn-total100000.tsv" \
-	--valid_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-sib200-valid/gn/translated_dev.tsv" \
-	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/annotated/grn_Latn/test.tsv"
+	--train_csv_path "./outputs/final-sib200/translated_filtered-bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.tsv" \
+	--valid_csv_path "./outputs/final-sib200-valid/${TGT_LANG}/translated_dev.tsv" \
+	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
