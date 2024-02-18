@@ -3,12 +3,13 @@
 
 LexC-Gen generates sentiment analysis and topic classification data for extremely low-resource languages using open-access models and bilingual lexicons. The key idea is to prompt LLMs to generate English (or any high-resource-language) task data using words from bilingual lexicons so the generated dataset can be better word-translated into low-resource languages.
 
-See our paper for further information. (Add link). 
+📄 Paper: 
+🗂️ Data Artifacts: https://github.com/BatsResearch/LexC-Gen-Data-Archive
 
-Our repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons, but our code are written in a manner that can be easily adapted to other tasks or lexicons.
+This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons, but our code are written in a manner that can be easily adapted to other tasks or bilingual lexicons.
 
 --
-## Setup
+## 🧱 Setup
 
 ```
 git clone ...
@@ -245,6 +246,7 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/annotated/grn_Latn/test.tsv"
 ```
 
-## Results Comparison (Sanity Check)
+## 🧩 Results Comparison (Sanity Check)
 
 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to improve reproducibility and provide a form of sanity check since for finetuning classifiers on certain low-resource languages, the average accuracy may vary.
+
