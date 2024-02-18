@@ -271,9 +271,31 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 
 ### (Evaluate on HF LexC-Gen Data)
 
-We also provide our synthetic LexC-Gen data on HuggingFace for reproducibility purpose. They are stored at:
+We also upload our LexC-Gen generated data to HuggingFace (HF) for reproducibility purpose. They are stored at:
 - 🤗 [BatsResearch/NusaX-senti-LexC-Gen](https://huggingface.co/datasets/BatsResearch/NusaX-senti-LexC-Gen)
 - 🤗 [BatsResearch/sib200-LexC-Gen](https://huggingface.co/datasets/BatsResearch/sib200-LexC-Gen)
+
+Because the columns of the HF datasets have to be renamed and the label names need to be changed into integer, we provide different scripts for evaluation.
+
+```bash
+# nusax
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+SIZE="100k"
+CONFIG="${TGT_LANG}_${SIZE}"
+python3 ./scripts_eval/nusax_task_hf_data.py \
+	--train_dataset_config $CONFIG \
+	--lang $TGT_LANG \
+	--num_epochs 100
+
+# sib200
+TGT_LANG_FULL="grn_Latn"
+SIZE="100k"
+CONFIG="${TGT_LANG_FULL}_${SIZE}"
+python3 ./scripts_eval/sib_task_hf_data.py \
+	--train_dataset_config $CONFIG \
+	--lang $TGT_LANG_FULL \
+	--num_epochs 100
+```
 
 ---
 ## 🧊 Baselines

@@ -14,6 +14,7 @@ from transformers import TrainingArguments
 from transformers import EarlyStoppingCallback
 from transformers import TrainingArguments, Trainer
 from utils.nusax_post_lexcgen import nusax_convert_str_to_int_label, nusax_convert_int_to_str_label, nusax_tokenize
+from utils.sib200_post_lexcgen import sib200_convert_str_to_int_label, sib200_convert_int_to_str_label, sib200_tokenize
 
 
 parser = argparse.ArgumentParser()
@@ -27,6 +28,7 @@ parser.add_argument("--filter_train_file", type=str, required=True, help="path t
 parser.add_argument("--filter_valid_file", type=str, required=True, help="path to the validation file for the filter model")
 parser.add_argument("--seed", type=int, default=42, help="random seed")
 parser.add_argument("--cache_dir", type=str, default="/users/zyong2/data/bats/models") # TODO: remove 
+parser.add_argument("--no_filter", action="store_true", help="if set, no filtering will be done. So we simply relabel the data (i.e., label distillation).")
 args = parser.parse_args()
 
 file = pathlib.Path(args.file)
@@ -92,10 +94,26 @@ if args.task_data == "nusax":
     val_dataset = val_dataset.map(nusax_convert_str_to_int_label)
     test_dataset = test_dataset.map(nusax_convert_str_to_int_label)
 
-
     tokenized_train_dataset = nusax_tokenize(tokenizer, train_dataset)
     tokenized_val_dataset = nusax_tokenize(tokenizer, val_dataset)
     tokenized_test_dataset = nusax_tokenize(tokenizer, test_dataset)
+
+elif args.task_data == "sib200":
+    train_dataset_df = pd.DataFrame(pd.read_csv(args.filter_train_file, sep="\t"))
+    train_dataset = Dataset.from_pandas(train_dataset_df)
+
+    val_dataset_df = pd.DataFrame(pd.read_csv(args.filter_valid_file, sep="\t"))
+    val_dataset = Dataset.from_pandas(val_dataset_df)
+
+    test_dataset = Dataset.from_pandas(df)
+
+    train_dataset = train_dataset.map(sib200_convert_str_to_int_label)
+    val_dataset = val_dataset.map(sib200_convert_str_to_int_label)
+    test_dataset = test_dataset.map(sib200_convert_str_to_int_label)
+
+    tokenized_train_dataset = sib200_tokenize(tokenizer, train_dataset, max_length=filter_config['max_length'])
+    tokenized_val_dataset = sib200_tokenize(tokenizer, val_dataset, max_length=filter_config['max_length'])
+    tokenized_test_dataset = sib200_tokenize(tokenizer, test_dataset, max_length=filter_config['max_length'])
 
 print(tokenized_train_dataset)
 print(tokenized_val_dataset)
@@ -104,7 +122,7 @@ print(tokenized_test_dataset)
 output_dir = pathlib.Path(args.output_dir)
 # adding target_lang just to avoid clashing with other experiments
 # cls is only trained on English data
-cls_dir = output_dir / f"cls/{args.task_data}-cls-{args.target_lang}-{args.filter_model_name}"
+cls_dir = output_dir / f"tmp/{args.task_data}-cls-{args.target_lang}-{args.filter_model_name}"
 cls_dir.mkdir(parents=True, exist_ok=True)
 
 metric = evaluate.load("accuracy")
@@ -142,17 +160,23 @@ trainer.train()
 
 res = trainer.predict(tokenized_test_dataset)
 predictions = np.argmax(res.predictions, axis=-1)
-print(predictions)
 if args.task_data == "nusax":
     predictions = nusax_convert_int_to_str_label(predictions)
-    print(predictions)
-    texts = df['text']
-    labels = df[filter_config['label_column']]
+elif args.task_data == "sib200":
+    predictions = sib200_convert_int_to_str_label(predictions)
 
+texts = df['text']
+labels = df[filter_config['label_column']]
 filtered_texts = list()
 filtered_labels = list()
 filtered_ids = list()
 for i, (text, label) in enumerate(zip(texts,labels)):
+    if args.no_filter:
+        filtered_texts.append(text)
+        filtered_labels.append(label)
+        filtered_ids.append(i)
+        continue
+
     if label.lower() == predictions[i].lower():
         filtered_texts.append(text)
         filtered_labels.append(label)
