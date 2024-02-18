@@ -244,7 +244,7 @@ python3 ./scripts/lexcgen_translate.py \
 	--output_dir "./outputs/final-sib200-valid/${TGT_LANG}"
 ```
 
-### Evaluate
+### Evaluate on Local LexC-Gen Data
 Now we perform task finetuning of mBERT classifier on the LexC-Gen generated data and evaluate on the test dataset.
 
 ```bash
@@ -268,6 +268,12 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--valid_csv_path "./outputs/final-sib200-valid/${TGT_LANG}/translated_dev.tsv" \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
+
+### (Evaluate on HF LexC-Gen Data)
+
+We also provide our synthetic LexC-Gen data on HuggingFace for reproducibility purpose. They are stored at:
+- 🤗 [BatsResearch/NusaX-senti-LexC-Gen](https://huggingface.co/datasets/BatsResearch/NusaX-senti-LexC-Gen)
+- 🤗 [BatsResearch/sib200-LexC-Gen](https://huggingface.co/datasets/BatsResearch/sib200-LexC-Gen)
 
 ---
 ## 🧊 Baselines
