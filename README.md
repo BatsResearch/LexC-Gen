@@ -54,9 +54,9 @@ We first prepare the CTG-training dataset from the existing task data.
 
 ```bash
 # nusax
-OUTPUT=... # your designated output folder for storing LexC-Gen data artifacts.
+OUTPUT_DIR=... # your designated output folder for storing LexC-Gen data artifacts.
 EXIST_DATA="${DATA}/nusax/datasets/sentiment/english/train.csv"
-OUTPUT_FILE="${OUTPUT}/ctg_data/nusax_en.txt"
+OUTPUT_FILE="${OUTPUT_DIR}/ctg_data/nusax_en.txt"
 TASK="nusax"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
@@ -64,9 +64,9 @@ python3 ./scripts/ctg_dataset.py \
 	--task_data $TASK
 
 # sib200
-OUTPUT=... # your designated output folder for storing LexC-Gen data artifacts.
+OUTPUT_DIR=... # your designated output folder for storing LexC-Gen data artifacts.
 EXIST_DATA="${DATA}/sib-200/data/eng/train.tsv"
-OUTPUT_FILE="${OUTPUT}/ctg_data/sib200_en.txt"
+OUTPUT_FILE="${OUTPUT_DIR}/ctg_data/sib200_en.txt"
 TASK="sib200"
 python3 ./scripts/ctg_dataset.py \
 	--existing_task_data $EXIST_DATA \
@@ -79,7 +79,6 @@ Now, we perform CTG-training for the BLOOMZ-7b1 model using [QLoRA (Dettmers et 
 
 ```bash
 # nusax
-OUTPUT_DIR=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub
 python3 ./scripts/ctg_train.py \
 	--ctg_dataset ./outputs/ctg_data/nusax_en.txt \
 	--output_dir $OUTPUT_DIR/bloomz-7b1-nusax-en-ctg/ \
@@ -89,7 +88,6 @@ python3 ./scripts/ctg_train.py \
 	--num_train_epochs 10
 
 # sib200
-OUTPUT_DIR=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub
 python3 ./scripts/ctg_train.py \
 	--ctg_dataset ./outputs/ctg_data/sib200_en.txt \
 	--output_dir $OUTPUT_DIR/bloomz-7b1-sib200-en-ctg/ \
@@ -104,13 +102,15 @@ We select the best QLoRA adapter checkpoint based on its ability to use provided
 
 We recommend selecting the best checkpoint for the language you want to create tasks for, although the best checkpoint for a language usually applies to other languages. 
 
+The code below evaluates a particular checkpoint on how many words it used (as is) on average from the provided list of 10 words to form sentences.
+
 ```bash
 # nusax
-CKPT=...
+CKPT=... # path to a particular lora checkpoint
 TGT_LANG="mad" # ace, ban, bbc, bjn, bug, mad, min
 python3 ./scripts/ctg_eval_ckpt.py \
 	--peft_model_id $CKPT \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--task_data "nusax" \
 	--tgt_lang $TGT_LANG \
 	--total 200 \
@@ -119,11 +119,11 @@ python3 ./scripts/ctg_eval_ckpt.py \
 	--do_print_output
 
 # sib200
-CKPT=...
-TGT_LANG="gn" # 
+CKPT=... # path to a particular lora checkpoint
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
 python3 ./scripts/ctg_eval_ckpt.py \
 	--peft_model_id $CKPT \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
 	--task_data "sib200" \
 	--tgt_lang $TGT_LANG \
 	--total 200 \
@@ -137,14 +137,14 @@ We have provided the scripts `scripts/ctg_eval_ckpt_nusax.sh` and `scripts/ctg_e
 **Sanity Check**: A good checkpoint for NusaX would use >5.5 provided tokens (out of 10) on average, and for SIB-200 it would be >1.5 tokens on average.
 
 ### Lexicon-Conditioned Task Data Generation
-We can now generate English data using the CTG-trained checkpoint and the bilingual lexicon. We already set the best hyperparameters.
+We can now generate English data using the CTG-trained checkpoint and the bilingual lexicon. We already set the best hyperparameters in the default arguments.
 
 ```bash
 # nusax
-TGT_LANG="ace" 
-TOTAL=10000
-CKPT=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub/bloomz-7b1-nusax-en-ctg/checkpoint-3000
-WRITE_FOLDER=/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/lexcgen-nusax
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+TOTAL=10000 # number of sentences to be generated
+CKPT=... # best checkpoint found
+WRITE_FOLDER="{OUTPUT_DIR}/lexcgen-nusax"
 WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-nusax-en-${TGT_LANG}-total${TOTAL}.txt"
 python3 ./scripts/lexcgen_ctg.py \
 	--write_file $WRITE_FILE \
@@ -152,21 +152,21 @@ python3 ./scripts/lexcgen_ctg.py \
 	--tgt_lang $TGT_LANG \
 	--total $TOTAL \
 	--task_data nusax \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos"
+	--lexicons_dir "${LEX}/url-nlp/gatitos"
 
 # sib200
-TGT_LANG="gn" 
-TOTAL=10000
-CKPT=/users/zyong2/data/zyong2/scaling/data/processed/905-lexcgen-pub/bloomz-7b1-sib200-en-ctg/checkpoint-3000
-WRITE_FOLDER=./outputs/lexcgen-sib200
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
+TOTAL=10000 # number of sentences to be generated
+CKPT=... # best checkpoint found
+WRITE_FOLDER="${OUTPUT_DIR}/lexcgen-sib200"
 WRITE_FILE="${WRITE_FOLDER}/bloomz-7b1-sib200-en-${TGT_LANG}-total${TOTAL}.txt"
 python3 ./scripts/lexcgen_ctg.py \
 	--write_file $WRITE_FILE \
 	--peft_model_id $CKPT \
 	--tgt_lang $TGT_LANG \
 	--total $TOTAL \
-	--task_data sib200 \
-	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos"
+	--task_data nusax \
+	--lexicons_dir "${LEX}/url-nlp/gatitos"
 ```
 
 ### Input-Label Filtering and Word-to-Word Translation
