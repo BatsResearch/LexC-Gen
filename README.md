@@ -41,7 +41,7 @@ git clone https://github.com/google-research/url-nlp.git
 
 ---
 
-## LexC-Gen
+## 💻 LexC-Gen Code
 ![LexC-Gen overview](assets/lexcgen-method.jpg)
 In step (1) and (2), we first train [BLOOMZ-7.1B (Muennighoff et al., 2023)](https://aclanthology.org/2023.acl-long.891/) for controlled-text generation (CTG) and then use it to generate English datasets conditioned on bilingual lexicons. After that, in step (3) and (4), we perform input-label consistency label filtering and word-to-word translation to translate the generated data into low-resource languages.
 
