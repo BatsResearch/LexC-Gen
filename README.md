@@ -209,7 +209,7 @@ python3 ./scripts/lexcgen_translate.py \
 
 ---
 
-## Evaluation
+## 🔍 Evaluation
 
 ### Generate Validation File
 ```bash
