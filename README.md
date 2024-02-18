@@ -269,7 +269,7 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
 
-### (Evaluate on HF LexC-Gen Data)
+### 🤗 Evaluate on HF LexC-Gen Data
 
 We also upload our LexC-Gen generated data to HuggingFace (HF) for reproducibility purpose. They are stored at:
 - 🤗 [BatsResearch/NusaX-senti-LexC-Gen](https://huggingface.co/datasets/BatsResearch/NusaX-senti-LexC-Gen)
