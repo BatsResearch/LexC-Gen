@@ -5,7 +5,7 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 
 See our paper for further information. (Add link). 
 
-Our repository provides code for LexC-Gen used for [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) and [SIB-200 (Adelani et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) datasets, but our code are written in a manner that can be easily adapted to other datasets. 
+Our repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons, but our code are written in a manner that can be easily adapted to other tasks or lexicons.
 
 --
 ## Setup
@@ -101,7 +101,7 @@ We recommend selecting the best checkpoint for the language you want to create t
 ```bash
 # nusax
 CKPT=...
-TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+TGT_LANG="mad" # ace, ban, bbc, bjn, bug, mad, min
 python3 ./scripts/ctg_eval_ckpt.py \
 	--peft_model_id $CKPT \
 	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
@@ -167,12 +167,11 @@ python3 ./scripts/lexcgen_ctg.py \
 Our codes here will generate four artifacts:
 - the English generated dataset in csv/tsv format. 
 - filtered English generated dataset.
-- tokenized and filtered English generated dataset.
 - translated generated task dataset.
 
 ```bash
 TGT_LANG="ace"
-WRITE_FILE="./outputs/lexcgen-nusax/bloomz-7b1-nusax-en-ace-total10000.txt"
+WRITE_FILE="./outputs/lexcgen-nusax/bloomz-7b1-nusax-en-ace-total100000.txt"
 OUTPUT_DIR="./outputs/final-nusax/"
 python3 ./scripts/lexcgen_filter.py \
 	--target_lang $TGT_LANG \
@@ -184,13 +183,68 @@ python3 ./scripts/lexcgen_filter.py \
 
 python3 ./scripts/lexcgen_translate.py \
 	--target_lang $TGT_LANG \
+	--file "./outputs/final-nusax/filtered-bloomz-7b1-nusax-en-ace-total100000.csv" \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--output_dir "./outputs/final-nusax/"
+
+# sib200
+TGT_LANG="gn"
+WRITE_FILE="./outputs/lexcgen-sib200/bloomz-7b1-sib200-en-gn-total100000.txt"
+OUTPUT_DIR="./outputs/final-sib200/"
+python3 ./scripts/lexcgen_filter.py \
+	--target_lang $TGT_LANG \
 	--file $WRITE_FILE \
-	--task_data "nusax" \
+	--task_data "sib200" \
 	--output_dir $OUTPUT_DIR \
-	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/train.csv" \
-	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv"
+	--filter_train_file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/train.tsv" \
+	--filter_valid_file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/dev.tsv"
+
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file "./outputs/final-sib200/filtered-bloomz-7b1-sib200-en-gn-total100000.tsv" \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--output_dir "./outputs/final-sib200/"
 ```
 
 ---
 
 ## Evaluation
+
+### Generate Validation File
+```bash
+TGT_LANG="mad"
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/english/valid.csv" \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--output_dir "./outputs/final-nusax-valid/${TGT_LANG}"
+
+TGT_LANG="gn"
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/eng/dev.tsv" \
+	--lexicons_dir "/oscar/data/sbach/zyong2/scaling/data/external/url-nlp/gatitos" \
+	--output_dir "./outputs/final-sib200-valid/${TGT_LANG}"
+```
+
+
+### Evaluate
+```bash
+TGT_LANG="ace"
+python3 ./scripts_eval/nusax_task_local_data.py \
+	--target_lang $TGT_LANG \
+	--train_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-nusax/translated_filtered-bloomz-7b1-nusax-en-ace-total100000.csv" \
+	--valid_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-nusax-valid/ace/translated_valid.csv" \
+	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/nusax/datasets/sentiment/acehnese/test.csv"
+
+TGT_LANG="gn"
+python3 ./scripts_eval/sib200_task_local_data.py \
+	--target_lang $TGT_LANG \
+	--train_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-sib200/translated_filtered-bloomz-7b1-sib200-en-gn-total100000.tsv" \
+	--valid_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-sib200-valid/gn/translated_dev.tsv" \
+	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/annotated/grn_Latn/test.tsv"
+```
+
+## Results Comparison (Sanity Check)
+
+We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to improve reproducibility and provide a form of sanity check since for finetuning classifiers on certain low-resource languages, the average accuracy may vary.
