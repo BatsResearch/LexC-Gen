@@ -9,7 +9,7 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 
 This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons, but our code are written in a manner that can be easily adapted to other tasks or bilingual lexicons.
 
---
+---
 ## 🧱 Setup
 
 ```
