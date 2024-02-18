@@ -297,7 +297,7 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 ### Notes
 
 - **Adding Existing Task Data**: This additional trick that works well for small word-translated datasets (word translation baseline and LexC-Gen-1K) is where we simply concatenate existing English training data to the translated training data.
-- **Label Distillation**: Add `--no_filter` argument when calling `./scripts/lexcgen_filter.py`.
+- **Label Distillation**: Add `--no_filter` argument when calling `./scripts/lexcgen_filter.py` to stop the script from filtering out mismatched input-label instances.
 
 ---
 ## 📍 Bibtex
