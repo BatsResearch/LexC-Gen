@@ -17,7 +17,7 @@ cd ...
 pip3 install -r requirements.txt
 ```
 
-## Download Task Datasets and Bilingual Lexicons
+## ⤵️ Download Task Datasets and Bilingual Lexicons
 ### Task Datasets
 We experiment with [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) and [SIB-200 (Adelani et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) datasets. These datasets are also available on HuggingFace but our work uses their raw csv/tsv files hosted on GitHub.
 
