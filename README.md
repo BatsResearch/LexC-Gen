@@ -293,6 +293,28 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
 
+### Word Translation
+We apply `lexcgen_translate.py` to the provided English train dataset to obtain the word-translated dataset with the following codes.
+
+Then we call the evaluation scripts with the word-translated files stored in the output directory passed to `--output_dir`.
+
+```bash
+# nusax
+TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file "${DATA}/nusax/datasets/sentiment/english/train.csv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
+	--output_dir "./outputs/baseline-nusax-${TGT_LANG}/"
+
+# sib200
+TGT_LANG="gn" # tum, ee, ln, fj, ts, bm, sg, ak, lus, gn
+python3 ./scripts/lexcgen_translate.py \
+	--target_lang $TGT_LANG \
+	--file "${DATA}/sib-200/data/eng/train.tsv" \
+	--lexicons_dir "${LEX}/url-nlp/gatitos" \
+	--output_dir "./outputs/baseline-sib200-${TGT_LANG}/"
+```
 
 ### Notes
 
