@@ -7,7 +7,10 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 
 🗂️ Data Artifacts: https://github.com/BatsResearch/LexC-Gen-Data-Archive
 
-This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons and reproducing our paper. But our code are written in a modular manner so it can be easily adapted to other tasks or bilingual lexicons.
+💻 This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons and reproducing our paper. But our code are written in a modular manner so it can be easily adapted to other tasks or bilingual lexicons.
+
+🧩 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to provide a form of sanity check for reproduced results by other researchers.
+
 
 ---
 ## 🧱 Setup
@@ -174,7 +177,7 @@ Our codes here will generate the following artifacts:
 - filtered English generated dataset (file starts with `filtered-*`).
 - translated generated task dataset (file starts with `translated_filtered-*`)
 
-**🎯 The translated generated task dataset is the data that we use to finetune task classifiers with.**
+**🎯 The translated generated task dataset is the synthetic data that we use to finetune task classifiers with.**
 
 ```bash
 TGT_LANG="ace" # ace, ban, bbc, bjn, bug, mad, min
@@ -253,8 +256,3 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--valid_csv_path "/users/zyong2/data/zyong2/scaling/zzz_lexcgen-pub/outputs/final-sib200-valid/gn/translated_dev.tsv" \
 	--test_csv_path "/users/zyong2/data/zyong2/scaling/data/external/sib-200/data/annotated/grn_Latn/test.tsv"
 ```
-
-## 🧩 Results Comparison (Sanity Check)
-
-We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to provide a form of sanity check for reproduced results by other researchers.
-
