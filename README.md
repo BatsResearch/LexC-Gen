@@ -211,7 +211,7 @@ python3 ./scripts/lexcgen_translate.py \
 
 ## 🔍 Evaluation
 
-### Generate Validation File
+### Generate Validation Dataset for Task Finetuning
 ```bash
 TGT_LANG="mad"
 python3 ./scripts/lexcgen_translate.py \
