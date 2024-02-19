@@ -9,8 +9,7 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 
 💻 This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons and reproducing our paper. But our code are written in a modular manner so it can be easily adapted to other tasks or bilingual lexicons.
 
-🧩 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs). Our intention is to provide a form of sanity check for reproduced results by other researchers.
-
+🧩 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs) reported, which can serve as a form of sanity check for other researchers reproducing our work.
 
 ---
 ## 🧱 Setup
