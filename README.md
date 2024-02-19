@@ -12,6 +12,12 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 🧩 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs) reported, which can serve as a form of sanity check for other researchers reproducing our work.
 
 ---
+
+## Table of Contents
+
+- [Setup](#setup)
+
+---
 ## Setup
 
 ```bash
