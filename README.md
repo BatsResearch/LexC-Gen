@@ -18,6 +18,20 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 - [Setup](#setup)
 - [Download Task Datasets and Bilingual Lexicons](#download-task-datasets-and-bilingual-lexicons)
 	- [Task Datasets](#task-datasets)
+	- [Bilingual Lexicons](#bilingual-lexicons)
+- [LexC-Gen Code](#lexc-gen-code)
+	- [CTG-Training](#ctg-training)
+	- [Lexicon-Conditioned Task Data Generation](#lexicon-conditioned-task-data-generation)
+	- [Input-Label Filtering and Word-to-Word Translation](#input-label-filtering-and-word-to-word-translation)
+- [Evaluation](#evaluation)
+	- [Generate Validation Dataset for Task Finetuning](#generate-validation-dataset-for-task-finetuning)
+	- [Evaluate on Local LexC-Gen Data](#evaluate-on-local-lexc-gen-data)
+	- [Evaluate on HF LexC-Gen Data](#evaluate-on-hf-lexc-gen-data)
+- [Baselines](#baselines)
+	- [Cross-Lingual Zero-Shot](#cross-lingual-zero-shot)
+	- [Word Translation](#word-translation)
+	- [Notes](#notes)
+
 
 ---
 ## Setup
