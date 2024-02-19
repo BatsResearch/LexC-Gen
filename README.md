@@ -12,12 +12,7 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 🧩 We provide our main results for NusaX and SIB-200 in `paper_results/` with average accuracy and standard deviations (over 5 runs) reported, which can serve as a form of sanity check for other researchers reproducing our work.
 
 ---
-## Table of contents
-
-- [Setup](#setup)
-
-
-## 🧱 Setup
+## Setup
 
 ```bash
 git clone https://github.com/BatsResearch/LexC-Gen.git
@@ -26,7 +21,7 @@ pip3 install -r requirements.txt
 mkdir outputs # create outputs directory in LexC-Gen folder for storing all generated data artifacts
 ```
 
-## ⤵️ Download Task Datasets and Bilingual Lexicons
+## Download Task Datasets and Bilingual Lexicons
 ### Task Datasets
 We experiment with [NusaX (Winata et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) and [SIB-200 (Adelani et al., 2023)](https://aclanthology.org/2023.eacl-main.57/) datasets. These datasets are also available on HuggingFace but our work uses their raw csv/tsv files hosted on GitHub.
 
@@ -52,7 +47,7 @@ git clone https://github.com/google-research/url-nlp.git
 
 ---
 
-## 💻 LexC-Gen Code
+## LexC-Gen Code
 ![LexC-Gen overview](assets/lexcgen-method.jpg)
 In step (1) and (2), we first train [BLOOMZ-7.1B (Muennighoff et al., 2023)](https://aclanthology.org/2023.acl-long.891/) for controlled-text generation (CTG) and then use it to generate English datasets conditioned on bilingual lexicons. After that, in step (3) and (4), we perform input-label consistency label filtering and word-to-word translation to translate the generated data into low-resource languages.
 
@@ -224,7 +219,7 @@ python3 ./scripts/lexcgen_translate.py \
 
 ---
 
-## 🔍 Evaluation
+## Evaluation
 
 ### Generate Validation Dataset for Task Finetuning
 Our synthetic data generated above are solely for training.
@@ -273,7 +268,7 @@ python3 ./scripts_eval/sib200_task_local_data.py \
 	--test_csv_path "${DATA}/sib-200/data/annotated/${SIB_TGT_LANG_FULL}/test.tsv"
 ```
 
-### 🤗 Evaluate on HF LexC-Gen Data
+### Evaluate on HF LexC-Gen Data
 
 We also upload our LexC-Gen generated data to HuggingFace (HF) for reproducibility purpose. They are stored at:
 - 🤗 [BatsResearch/NusaX-senti-LexC-Gen](https://huggingface.co/datasets/BatsResearch/NusaX-senti-LexC-Gen)
@@ -307,7 +302,7 @@ python3 ./scripts_eval/sib200_task_hf_data.py \
 ```
 
 ---
-## 🧊 Baselines
+## Baselines
 
 ### Cross-Lingual Zero-Shot
 Baseline where we finetune classifier on English (existing) train dataset.
@@ -361,6 +356,5 @@ python3 ./scripts/lexcgen_translate.py \
 - **Label Distillation**: Add `--no_filter` argument when calling `./scripts/lexcgen_filter.py` to stop the script from filtering out mismatched input-label instances.
 
 ---
-## 📍 Bibtex
 
 TODO
