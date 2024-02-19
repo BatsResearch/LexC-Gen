@@ -16,6 +16,8 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 ## Table of Contents
 
 - [Setup](#setup)
+- [Download Task Datasets and Bilingual Lexicons](#download-task-datasets-and-bilingual-lexicons)
+	- [Task Datasets](#task-datasets)
 
 ---
 ## Setup
