@@ -20,9 +20,9 @@ LexC-Gen generates sentiment analysis and topic classification data for extremel
 	- [Task Datasets](#task-datasets)
 	- [Bilingual Lexicons](#bilingual-lexicons)
 - [LexC-Gen Code](#lexc-gen-code)
-	- [CTG-Training](#ctg-training)
-	- [Lexicon-Conditioned Task Data Generation](#lexicon-conditioned-task-data-generation)
-	- [Input-Label Filtering and Word-to-Word Translation](#input-label-filtering-and-word-to-word-translation)
+	- [1. CTG-Training](#ctg-training)
+	- [2. Lexicon-Conditioned Task Data Generation](#lexicon-conditioned-task-data-generation)
+	- [3. Input-Label Filtering and Word-to-Word Translation](#input-label-filtering-and-word-to-word-translation)
 - [Evaluation](#evaluation)
 	- [Generate Validation Dataset for Task Finetuning](#generate-validation-dataset-for-task-finetuning)
 	- [Evaluate on Local LexC-Gen Data](#evaluate-on-local-lexc-gen-data)
@@ -73,7 +73,7 @@ git clone https://github.com/google-research/url-nlp.git
 ![LexC-Gen overview](assets/lexcgen-method.jpg)
 In step (1) and (2), we first train [BLOOMZ-7.1B (Muennighoff et al., 2023)](https://aclanthology.org/2023.acl-long.891/) for controlled-text generation (CTG) and then use it to generate English datasets conditioned on bilingual lexicons. After that, in step (3) and (4), we perform input-label consistency label filtering and word-to-word translation to translate the generated data into low-resource languages.
 
-### CTG-Training 
+### 1. CTG-Training 
 #### Prepare CTG-Training Dataset
 We first prepare the CTG-training dataset from the existing task data.
 
@@ -159,7 +159,7 @@ We have provided the scripts `scripts/ctg_eval_ckpt_nusax.sh` and `scripts/ctg_e
 
 **Sanity Check**: A good checkpoint for NusaX would use >5.5 provided tokens (out of 10) on average, and for SIB-200 it would be >1.5 tokens on average.
 
-### Lexicon-Conditioned Task Data Generation
+### 2. Lexicon-Conditioned Task Data Generation
 We can now generate English data using the CTG-trained checkpoint and the bilingual lexicon. We already set the best hyperparameters in the default arguments.
 
 ```bash
@@ -192,7 +192,7 @@ python3 ./scripts/lexcgen_ctg.py \
 	--lexicons_dir "${LEX}/url-nlp/gatitos"
 ```
 
-### Input-Label Filtering and Word-to-Word Translation
+### 3. Input-Label Filtering and Word-to-Word Translation
 Our codes here will generate the following artifacts:
 - the English generated dataset (originally in `txt` format) in csv/tsv format. 
 - filtered English generated dataset (file starts with `filtered-*`).
