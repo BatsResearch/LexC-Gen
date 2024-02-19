@@ -243,7 +243,7 @@ python3 ./scripts/lexcgen_translate.py \
 
 ## Evaluation
 
-### Generate Validation Dataset for Task Finetuning
+### 1. Generate Validation Dataset for Task Finetuning
 Our synthetic data generated above are solely for training.
 
 For validation data, we perform word translation on the existing task validation data.
@@ -265,7 +265,7 @@ python3 ./scripts/lexcgen_translate.py \
 	--output_dir "./outputs/final-sib200-valid/${TGT_LANG}"
 ```
 
-### Evaluate on Local LexC-Gen Data
+### 2. Evaluate on Local LexC-Gen Data
 Now we perform task finetuning of mBERT classifier on the LexC-Gen generated data and evaluate on the test dataset.
 
 ```bash
