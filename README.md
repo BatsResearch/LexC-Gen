@@ -379,4 +379,11 @@ python3 ./scripts/lexcgen_translate.py \
 
 ---
 
-TODO
+```
+@article{yong2024lexcgen,
+  author    = {},
+  title     = {},
+  journal   = {Preprint},
+  year      = {2024},
+}
+```
