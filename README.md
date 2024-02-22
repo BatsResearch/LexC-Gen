@@ -1,5 +1,5 @@
 
-# LexC-Gen: Lexicon-Conditioned Data Generation for Extremely Low-Resource Languages
+# LexC-Gen: Generating Data for Extremely Low-Resource Languages with Large Language Models and Bilingual Lexicons
 
 LexC-Gen generates sentiment analysis and topic classification data for extremely low-resource languages using open-access models and bilingual lexicons. The key idea is to prompt LLMs to generate English (or any high-resource-language) task data using words from bilingual lexicons so the generated dataset can be better word-translated into low-resource languages.
 
