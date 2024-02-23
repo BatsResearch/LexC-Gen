@@ -31,6 +31,7 @@ LexC-Gen (which stands for **lexicon-conditioned generation**) generates labeled
 	- [Cross-Lingual Zero-Shot](#cross-lingual-zero-shot)
 	- [Word Translation](#word-translation)
 	- [Notes](#notes)
+- [Bibtex](#bibtex)
 
 
 ---
@@ -379,6 +380,7 @@ python3 ./scripts/lexcgen_translate.py \
 
 ---
 
+### Bibtex
 ```
 @misc{yong2024lexcgen,
       title={LexC-Gen: Generating Data for Extremely Low-Resource Languages with Large Language Models and Bilingual Lexicons}, 
