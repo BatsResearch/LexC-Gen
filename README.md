@@ -1,12 +1,14 @@
 # LexC-Gen: Generating Data for Extremely Low-Resource Languages with Large Language Models and Bilingual Lexicons
 
-[![HF Paper page](https://huggingface.co/datasets/huggingface/badges/resolve/main/paper-page-sm-dark.svg)](https://huggingface.co/papers/2402.14086)
+<p align="center">
+    <a href="https://huggingface.co/papers/2402.14086"><img src="https://badgen.net/static/featured/⭐️ HF Daily Papers/orange" /></a>
+    <a href="https://arxiv.org/abs/2402.14086"><img src="https://badgen.net/static/arxiv/2402.14086/blue" /></a>
+    <a href="https://x.com/yong_zhengxin/status/1760862095027871925?s=20"><img src="https://badgen.net/static/Twitter/summary/blue?icon=twitter" /></a>
+    <a href="https://github.com/BatsResearch/LexC-Gen"><img src="https://badgen.net/static/repo/code/yellow?icon=github" /></a>
+    <a href="https://github.com/BatsResearch/LexC-Gen-Data-Archive"><img src="https://badgen.net/static/repo/data artifacts/yellow?icon=github" /></a>
+</p>
 
 LexC-Gen (which stands for **lexicon-conditioned generation**) generates labeled classification data for extremely low-resource languages using open-access LLMs and bilingual lexicons. The key idea is to prompt LLMs to generate English (or any high-resource-language) task data using words from bilingual lexicons so the generated dataset can be better word-translated into low-resource languages. Here, we explore sentiment analysis and topic classification for 17 extremely low-resource languages.
-
-📄 Paper: https://arxiv.org/abs/2402.14086
-
-🗂️ Data Artifacts: https://github.com/BatsResearch/LexC-Gen-Data-Archive
 
 💻 This repository provides code for LexC-Gen used for generating sentiment analysis and topic classification data using Gatitos bilingual lexicons and reproducing our paper. But our code are written in a modular manner so it can be easily adapted to other tasks or bilingual lexicons.
 
